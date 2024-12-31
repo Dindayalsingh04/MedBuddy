@@ -1,11 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button, ScrollView ,Alert , TouchableOpacity  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useMealData } from '../mealtime/MealTimeLogic'; // Use the custom hook for meal data management
+import ImageUploader from '../components/ImageUploader'; // Import the ImageUploader component
+import * as Clipboard from 'expo-clipboard';
+
+
+const handleCopy = async () => {
+  try {
+    // Using setStringAsync instead of the deprecated setString
+    await Clipboard.setStringAsync(JSON.stringify(uploadedImageData, null, 2));
+    Alert.alert('Copied to Clipboard!');
+  } catch (error) {
+    console.error('Error copying to clipboard:', error);
+    Alert.alert('Failed to copy to clipboard');
+  }
+};
 
 const HomeScreen = ({ route }) => {
   const { userId } = route.params || {};
   const navigation = useNavigation();
+  const [uploadedImageData, setUploadedImageData] = useState(null);
 
   // Ensure userId is available before proceeding
   if (!userId) {
@@ -25,9 +40,26 @@ const HomeScreen = ({ route }) => {
     ));
   };
 
+  const handleCopy = async () => {
+    try {
+      // Using setStringAsync instead of the deprecated setString
+      await Clipboard.setStringAsync(JSON.stringify(uploadedImageData, null, 2));
+      Alert.alert('Copied to Clipboard!');
+    } catch (error) {
+      console.error('Error copying to clipboard:', error);
+      Alert.alert('Failed to copy to clipboard');
+    }
+  };
+
+  // Callback function to handle OCR detection results
+  const handleResult = (data) => {
+    console.log('OCR Detections from server:', data);
+    // Handle OCR result here (e.g., updating meal data or setting reminders)
+    setUploadedImageData(data);
+  };
+
   return (
-    <View style={styles.container}>
-      
+    <ScrollView contentContainerStyle={styles.container}>
       {/* Meal Schedule Box */}
       <View style={styles.scheduleBox}>
         <Text style={styles.scheduleTitle}>Your Meal Schedule:</Text>
@@ -41,25 +73,44 @@ const HomeScreen = ({ route }) => {
         <View style={styles.buttonContainer}>
           <Button
             title="Edit Meal Times"
-            onPress={() => 
-              navigation.navigate('MealTimeEdit', { 
-                userId, 
-                updateMealData // Pass the userId and updateMealData function
+            onPress={() =>
+              navigation.navigate('MealTimeEdit', {
+                userId,
+                updateMealData, // Pass the userId and updateMealData function
               })
             }
           />
         </View>
       </View>
+
       {/* Welcome Header */}
       <Text style={styles.headerText}>Welcome to Home Screen, User: {userId}</Text>
 
-    </View>
+      {/* Image Uploader */}
+      <View style={styles.uploaderBox}>
+        <Text style={styles.uploaderTitle}>Upload Prescription Sticker:</Text>
+        <ImageUploader onResult={handleResult} />
+      </View>
+
+      {/* Display Uploaded OCR Data */}
+      {uploadedImageData && (
+          <View style={styles.resultBox}>
+            <Text style={styles.resultTitle}>OCR Detection Results:</Text>
+            console.log('OCR Detections from server:', JSON.stringify(uploadedImageData, null, 2));
+            <TouchableOpacity onPress={handleCopy}>
+              <Text style={styles.resultText}>
+                {JSON.stringify(uploadedImageData, null, 2)}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-start', // Align everything to the top
     alignItems: 'center',
     padding: 20,
@@ -103,6 +154,31 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 10,
+  },
+  uploaderBox: {
+    marginVertical: 20,
+    alignItems: 'center',
+  },
+  uploaderTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  resultBox: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#eef',
+    borderRadius: 10,
+    width: '100%',
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  resultText: {
+    fontSize: 14,
+    color: '#444',
   },
 });
 

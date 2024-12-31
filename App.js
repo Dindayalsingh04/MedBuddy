@@ -23,8 +23,8 @@ import MealTimeEditScreen from "./mealtime/MealTimeEditScreen"; // Import the Me
 const HomeScreenOptions = ({ navigation, route }) => ({
   title: "MedBuddy",
   headerStyle: {
-    backgroundColor: '#fff', // Background color for the header
-    shadowColor: 'transparent', // Remove shadow on iOS
+    backgroundColor: "#fff", // Background color for the header
+    shadowColor: "transparent", // Remove shadow on iOS
     elevation: 0, // Remove shadow on Android
     height: 80, // Adjust header height
     paddingHorizontal: 20, // Provide padding to the sides
@@ -32,9 +32,9 @@ const HomeScreenOptions = ({ navigation, route }) => ({
 
   headerTitleStyle: {
     fontSize: 24, // Increase font size for the title
-    fontWeight: 'bold', // Make the title bold
-    color: '#333', // Dark color for the title
-    alignSelf: 'center', // Center the title horizontally
+    fontWeight: "bold", // Make the title bold
+    color: "#333", // Dark color for the title
+    alignSelf: "center", // Center the title horizontally
     paddingLeft: 90,
   },
 
@@ -51,7 +51,9 @@ const HomeScreenOptions = ({ navigation, route }) => ({
   ),
 
   headerRight: () => (
-    <View style={{ paddingRight: 15 }}> {/* Wrap the Button in a View to add padding */}
+    <View style={{ paddingRight: 15 }}>
+      {" "}
+      {/* Wrap the Button in a View to add padding */}
       <Button
         onPress={() => {
           // Reset the navigation stack and navigate back to Login screen
