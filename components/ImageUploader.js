@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Button, Image, StyleSheet, Alert } from 'react-native';
+import { View, TouchableOpacity, Image, StyleSheet, Text, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
 const ImageUploader = ({ onResult }) => {
   const [imageUri, setImageUri] = useState(null);
 
-  // Request permission when the component mounts
   useEffect(() => {
     (async () => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -17,15 +16,14 @@ const ImageUploader = ({ onResult }) => {
   }, []);
 
   const pickImage = async () => {
-    // Check permission status before opening image picker
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission Denied', 'We need permission to access your media.');
-      return; // Exit if no permission
+      return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Correct usage for Images
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
     });
@@ -52,9 +50,12 @@ const ImageUploader = ({ onResult }) => {
       type: 'image/jpeg',
     });
 
+    console.log('Uploading image to server with URI:', uri);
+
     try {
       const response = await axios.post('http://192.168.140.16:5000/detect', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        
       });
 
       console.log('Server response:', response.data);
@@ -62,27 +63,84 @@ const ImageUploader = ({ onResult }) => {
       // Ensure onResult is defined before calling it
       if (onResult && typeof onResult === 'function') {
         onResult(response.data);
+        Alert.alert('Success!', 'Uploaded image successfully!');
       } else {
         console.warn('onResult is not defined or is not a function');
       }
     } catch (error) {
       console.error('Error uploading image:', error); // Log error for debugging
+      if (error.response) {
+        console.error('Server responded with:', error.response.data); 
+      }
       Alert.alert('Error', 'Failed to process image.');
     }
   };
 
   return (
     <View style={styles.container}>
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-      <Button title="Pick Image" onPress={pickImage} />
-      <Button title="Upload Image" onPress={() => uploadImage(imageUri)} />
+      <View style={styles.innerBox}>
+        {imageUri && (
+          <Image source={{ uri: imageUri }} style={styles.image} />
+        )}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.button} onPress={pickImage}>
+            <Text style={styles.buttonText}>Pick Image</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => uploadImage(imageUri)}>
+            <Text style={styles.buttonText}>Upload Image</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', marginVertical: 20 },
-  image: { width: 200, height: 200, marginBottom: 10 },
+  container: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerBox: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 15,
+    padding: 20,
+    width: '90%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    marginBottom: 20,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'sans-serif',
+  },
 });
+
 
 export default ImageUploader;

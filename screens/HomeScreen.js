@@ -156,12 +156,24 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   uploaderBox: {
-    marginVertical: 20,
-    alignItems: 'center',
+    backgroundColor: '#ffffff', // White background
+    padding: 20,
+    borderRadius: 15, // Rounded corners
+    marginVertical: 15, // Spacing around the box
+    shadowColor: '#000', // Shadow color
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset
+    shadowOpacity: 0.1, // Shadow transparency
+    shadowRadius: 4, // Shadow spread
+    elevation: 5, // Android shadow
+    alignItems: 'center', // Center content
   },
   uploaderTitle: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 18, // Font size
+    fontWeight: 'bold', // Bold text
+    color: '#4CAF50', // Green color matching buttons
+    marginBottom: 10, // Spacing below the title
+    fontFamily: 'sans-serif', // Clean, modern font
+    textAlign: 'center', // Center-align the text
   },
   resultBox: {
     marginTop: 20,
