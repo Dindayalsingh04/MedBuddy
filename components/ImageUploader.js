@@ -28,12 +28,30 @@ const ImageUploader = ({ onResult }) => {
       quality: 1,
     });
 
-    console.log('Image Picker Result:', result); // Log the result to check what is returned
-
     if (!result.canceled) {
       setImageUri(result.assets[0].uri); // Accessing the correct property for URI
     } else {
       Alert.alert('Image Picker', 'No image selected.');
+    }
+  };
+
+  const takePicture = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'We need permission to access your camera.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    } else {
+      Alert.alert('Camera', 'No picture taken.');
     }
   };
 
@@ -50,7 +68,6 @@ const ImageUploader = ({ onResult }) => {
       type: 'image/jpeg',
     });
 
-    console.log('Uploading image to server with URI:', uri);
 
     try {
       const response = await axios.post('http://192.168.140.16:5000/detect', formData, {
@@ -86,9 +103,14 @@ const ImageUploader = ({ onResult }) => {
           <TouchableOpacity style={styles.button} onPress={pickImage}>
             <Text style={styles.buttonText}>Pick Image</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => uploadImage(imageUri)}>
-            <Text style={styles.buttonText}>Upload Image</Text>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.buttonText}>Take Picture</Text>
           </TouchableOpacity>
+          <View style={styles.centerButton}>
+            <TouchableOpacity style={styles.button} onPress={() => uploadImage(imageUri)}>
+              <Text style={styles.buttonText}>Upload Image</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -124,23 +146,28 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   button: {
     backgroundColor: '#4CAF50',
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    fontFamily: 'sans-serif',
+    textAlign: 'center',
+  },
+  centerButton: {
+    
+    paddingLeft: 50,
   },
 });
-
 
 export default ImageUploader;

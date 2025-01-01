@@ -4,18 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useMealData } from '../mealtime/MealTimeLogic'; // Use the custom hook for meal data management
 import ImageUploader from '../components/ImageUploader'; // Import the ImageUploader component
 import * as Clipboard from 'expo-clipboard';
+import EdgeDetection from '../components/EdgeDetection';
 
 
-const handleCopy = async () => {
-  try {
-    // Using setStringAsync instead of the deprecated setString
-    await Clipboard.setStringAsync(JSON.stringify(uploadedImageData, null, 2));
-    Alert.alert('Copied to Clipboard!');
-  } catch (error) {
-    console.error('Error copying to clipboard:', error);
-    Alert.alert('Failed to copy to clipboard');
-  }
-};
+
 
 const HomeScreen = ({ route }) => {
   const { userId } = route.params || {};
@@ -44,7 +36,7 @@ const HomeScreen = ({ route }) => {
     try {
       // Using setStringAsync instead of the deprecated setString
       await Clipboard.setStringAsync(JSON.stringify(uploadedImageData, null, 2));
-      Alert.alert('Copied to Clipboard!');
+      
     } catch (error) {
       console.error('Error copying to clipboard:', error);
       Alert.alert('Failed to copy to clipboard');
@@ -91,6 +83,13 @@ const HomeScreen = ({ route }) => {
         <Text style={styles.uploaderTitle}>Upload Prescription Sticker:</Text>
         <ImageUploader onResult={handleResult} />
       </View>
+
+      {/* cloudinary Uploader */}
+      <View style={styles.uploaderBox}>
+        <Text style={styles.uploaderTitle}>Edge Detection:</Text>
+        <EdgeDetection />
+      </View>
+      
 
       {/* Display Uploaded OCR Data */}
       {uploadedImageData && (
@@ -156,24 +155,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   uploaderBox: {
-    backgroundColor: '#ffffff', // White background
-    padding: 20,
-    borderRadius: 15, // Rounded corners
-    marginVertical: 15, // Spacing around the box
-    shadowColor: '#000', // Shadow color
-    shadowOffset: { width: 0, height: 2 }, // Shadow offset
-    shadowOpacity: 0.1, // Shadow transparency
-    shadowRadius: 4, // Shadow spread
-    elevation: 5, // Android shadow
-    alignItems: 'center', // Center content
+    width: '100%',
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   uploaderTitle: {
-    fontSize: 18, // Font size
-    fontWeight: 'bold', // Bold text
-    color: '#4CAF50', // Green color matching buttons
-    marginBottom: 10, // Spacing below the title
-    fontFamily: 'sans-serif', // Clean, modern font
-    textAlign: 'center', // Center-align the text
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
   },
   resultBox: {
     marginTop: 20,
